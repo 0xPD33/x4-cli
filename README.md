@@ -1,7 +1,7 @@
 # x4-cli
 
 `x4-cli` puts books on an Xteink X4 e-reader over Wi-Fi.
-It works with the stock firmware and with [CrossPoint Reader](https://github.com/crosspoint-reader/crosspoint-reader).
+It needs the open-source [CrossPoint Reader](https://github.com/crosspoint-reader/crosspoint-reader) firmware on the X4.
 
 ```console
 $ x4-cli sync ~/Books --save
@@ -41,9 +41,7 @@ nix run github:0xPD33/x4-cli -- status
 
 The X4 serves files only while its File Transfer screen is open.
 
-1. On the X4, open File Transfer.
-   - On CrossPoint, choose **Join a Network**. The X4 then joins your Wi-Fi.
-   - On the stock firmware, open the file transfer screen. `x4-cli` looks for it at `192.168.3.3`.
+1. On the X4, open File Transfer and choose **Join a Network**. The X4 then joins your Wi-Fi.
 2. Put your computer on the same network as the X4.
 3. Run `x4-cli find --save`. This finds the X4 and remembers its address.
 
@@ -75,8 +73,8 @@ uptime     414 s
 | `x4-cli add <files...>` | Uploads books. |
 | `x4-cli sync [folder]` | Uploads every book in a local folder that the X4 does not have. |
 | `x4-cli rm <names...>` | Deletes files. Names can be globs such as `"*Dune*"`. `-r` deletes folders. |
-| `x4-cli pull <name>` | Downloads a file. CrossPoint only. |
-| `x4-cli mv <name> <dest>` | Renames a file or moves it into a folder. CrossPoint only. |
+| `x4-cli pull <name>` | Downloads a file. |
+| `x4-cli mv <name> <dest>` | Renames a file or moves it into a folder. |
 | `x4-cli find` | Looks for the X4 on your network. |
 
 Every command takes `--host <address>` and `--trace`. `--trace` prints each raw request and reply.
@@ -132,7 +130,7 @@ x4-cli sync ~/Comics --to /Comics
 
 ### A weak Wi-Fi signal
 
-The X4 can drop off the network during a transfer when its signal is weak. On CrossPoint, `x4-cli status` shows the signal and warns below -80 dBm.
+The X4 can drop off the network during a transfer when its signal is weak. `x4-cli status` shows the signal and warns below -80 dBm.
 
 When an upload breaks, `x4-cli` does this:
 
@@ -157,20 +155,9 @@ no_spaces = false         # true: `Frank_Herbert-Dune.epub`
 
 `x4-cli` finds the address in this order: `--host`, the `X4_HOST` environment variable, the config file, then discovery.
 
-## Firmware support
+## Tested firmware
 
-| | CrossPoint | Stock |
-|---|---|---|
-| `status` | Version, signal, memory | Reachable or not |
-| `ls`, `add`, `sync`, `rm` | Yes | Yes |
-| `pull`, `mv` | Yes | No |
-| Upload method | WebSocket; HTTP as a fallback | HTTP |
-
-`x4-cli` detects the firmware and remembers it for each address. After you flash other firmware, run `x4-cli status` to detect it again.
-
-I tested `find`, `status`, `ls`, `add`, `mv` and `rm` on a real X4 with CrossPoint 1.5.0. The stock support follows the requests of [send-to-x4](https://github.com/Xatpy/send-to-x4-mobile-app), and I did not test it on a device. If you use the stock firmware, please open an issue with the `--trace` output of `x4-cli status` and `x4-cli ls /`.
-
-CrossPoint is open source and has a better API. If your X4 runs the stock firmware, consider flashing CrossPoint.
+I tested `find`, `status`, `ls`, `add`, `mv` and `rm` on a real X4 with CrossPoint 1.5.0.
 
 ## How discovery works
 
@@ -178,7 +165,7 @@ CrossPoint is open source and has a better API. If your X4 runs the stock firmwa
 
 - It sends `hello` to UDP port 8134. CrossPoint answers this. `x4-cli` sends a broadcast, and also sends to each address on your local /24 network, because a stateful firewall drops the answers to a broadcast.
 - It looks up `crosspoint.local` with your system resolver (mDNS).
-- It tries `192.168.3.3`, the usual stock address, and `192.168.4.1`, the CrossPoint hotspot.
+- It tries `192.168.4.1`, the CrossPoint hotspot.
 
 ## Security
 

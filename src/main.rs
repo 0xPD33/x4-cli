@@ -20,7 +20,7 @@ pub type Result<T, E = Box<dyn std::error::Error>> = std::result::Result<T, E>;
 #[command(
     name = "x4-cli",
     version,
-    about = "Put books on an Xteink X4 over Wi-Fi (stock or CrossPoint firmware)"
+    about = "Put books on an Xteink X4 running CrossPoint firmware, over Wi-Fi"
 )]
 struct Cli {
     /// Device address, e.g. 192.168.3.3 or crosspoint.local [default: config file, then discovery]
@@ -87,16 +87,16 @@ enum Cmd {
         #[arg(short, long)]
         yes: bool,
     },
-    /// Download a file (CrossPoint only)
+    /// Download a file
     Pull {
         name: String,
         /// Local file or folder [default: current folder]
         #[arg(short, long)]
         output: Option<PathBuf>,
     },
-    /// Rename a file or move it into a folder (CrossPoint only)
+    /// Rename a file or move it into a folder
     Mv { name: String, dest: String },
-    /// Look for an X4: UDP broadcast, mDNS, then the stock and CrossPoint hotspot IPs
+    /// Look for an X4: UDP broadcast, mDNS, then the CrossPoint hotspot IP
     Find {
         /// Save the first device found as the default host
         #[arg(long)]
